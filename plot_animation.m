@@ -9,22 +9,30 @@ constants = load_constants('castalia','true'); % only 1024 faces
 asteroid_grav = polyhedron_shape_input(constants);
 constants.asteroid_grav = asteroid_grav;
 
+type = 'none';
+
 % initialize a figure for the body fixed and inertial transfer animations
 body_fig = figure();
+axis off
 axis equal
 hold on
 
 ast_body = patch('Faces',constants.F,'Vertices',constants.V);
-
 set(ast_body,'FaceLighting','gouraud','AmbientStrength',0.5,...
     'Facealpha',1,'Facecolor','green', 'EdgeAlpha',0.5);
+axis([-6 6 -6 6 -2 2]);
+
+view(3)
 
 inertial_fig = figure();
 hold on
+axis off
 axis equal
 ast_inertial = patch('Faces',constants.F,'Vertices',constants.V);
 set(ast_inertial,'FaceLighting','gouraud','AmbientStrength',0.5,...
     'Facealpha',1,'Facecolor','green', 'EdgeAlpha',0.5);
+axis([-6 6 -6 6 -2 2]);
+view(3)
 
 % load the transfers and save to a big array
 time_total = [];
@@ -91,11 +99,19 @@ end
 state_inertial = zeros(size(state_body));
 control_inertial = zeros(size(control_body));
 
-nFrames = length(time_total);
-vidObj = VideoWriter('animation.avi');
-vidObj.Quality = 100;
-vidObj.FrameRate = 8;
-open(vidObj);
+switch type
+    case 'gif'
+        f = getframe;
+        [im,map] = rgb2ind(f.cdata,256,'nodither');
+    case 'movie'
+        nFrames = length(time_total);
+        vidObj = VideoWriter('animation.avi');
+        vidObj.Quality = 100;
+        vidObj.FrameRate = 8;
+        open(vidObj);
+end
+
+
     
 % plot both in another loop and save a video to create the animation
 for ii = 1:50:length(time_total)
@@ -122,9 +138,38 @@ for ii = 1:50:length(time_total)
     plot3(pos_inertial(1),pos_inertial(2),pos_inertial(3),'Color',seg_color{ii},'Marker','.','Markersize',10,'LineStyle','-')
     drawnow
     
-    writeVideo(vidObj,getframe(gca));
+    switch type
+        case 'gif'
+            
+            frame = getframe(1);
+            im = frame2im(frame);
+            [imind,cm] = rgb2ind(im,256);
+            outfile = ['animation.gif'];
+            
+            % On the first loop, create the file. In subsequent loops, append.
+            if ii==1
+                imwrite(imind,cm,outfile,'gif','DelayTime',0,'loopcount',inf);
+            else
+                imwrite(imind,cm,outfile,'gif','DelayTime',0,'writemode','append');
+            end
+        case 'movie'
+            writeVideo(vidObj,getframe(gca));
+        otherwise
+            
+            
+    end
     
     
 end
 
-close(vidObj);
+% Output the movie as an avi file
+switch type
+    case 'gif'
+        
+        
+    case 'movie'
+    close(vidObj);
+    
+    otherwise
+        
+end
