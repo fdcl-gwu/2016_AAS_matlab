@@ -58,6 +58,7 @@ load('./results/initial_transfer4.mat');
 time_total = [];
 control_total = [];
 state_total = [];
+seg_color = {}; % color of the segment based on which portion of teh trajectory it is a part of
 
 % loop over and load each stage of transfer
 for stage = 1:4
@@ -121,7 +122,9 @@ for stage = 1:4
         state_total = [state_total;min_reach.traj];
     end
     
-    
+    for ii = 1:length(min_reach.time)
+        seg_color{end+1} = C{stage};
+    end
 end
 
 % plot the initial and target states on each of the plots
@@ -169,6 +172,9 @@ plot3(sol_output.traj(:,1),sol_output.traj(:,2),sol_output.traj(:,3),'r','linewi
 time_total = [time_total;sol_output.t+time_total(end)];
 control_total = [control_total;sol_output.control]*1e6;
 state_total = [state_total;sol_output.state];
+for ii = 1:length(sol_output.t)
+    seg_color{end+1} = 'red' ;
+end
 
 % compute the final control input
 % Control
