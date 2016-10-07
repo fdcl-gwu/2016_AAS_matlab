@@ -42,4 +42,8 @@ asteroid_transfer_analysis.m - Plots the transfers using the saved mat files in 
 
 ## Final transfer
 
-The results in ./results/5constraint_transfer shows the results used in the paper for AAS
+The results in ./results/4constraint_transfer shows the results used in the paper for 2016 AAS
+
+You can generate the the plots by running asteroid_transfer_analysis.m
+
+This is also stored in the git repository by checking out the 2016AAS tag
